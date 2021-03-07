@@ -7,21 +7,25 @@
 // console.log(farbe_aktuell);
 
 // <== für daten aus Influxdb lesen (Trockner, Waschmaschine) 
-let test_zeitstempel = new Date("2021-02-06T11:47:06.453Z");
-let datum = new Date();
-if (test_zeitstempel.getMonth() == datum.getMonth()) {
-    console.log("passt");
-} else {
-    console.log("passt nicht!");
-}
+// let test_zeitstempel = new Date("2021-02-06T11:47:06.453Z");
+// let datum = new Date();
+// if (test_zeitstempel.getMonth() == datum.getMonth()) {
+//     console.log("passt");
+// } else {
+//     console.log("passt nicht!");
+// }
 // console.log(datum.getMonth());
 // console.log(datum.getMonth()-1);
 // console.log(datum.getMonth()-2);
 // console.log(datum.getMonth()-3);
 
-let end = new Date(Date.now()).toLocaleDateString("de-DE", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-});
-console.log(end);
+// let end = new Date(Date.now()).toLocaleDateString("de-DE", {
+//     year: "numeric",
+//     month: "2-digit",
+//     day: "2-digit"
+// });
+// console.log(end);
+let wert = 58983811;
+let wert2 = 13081924;
+let stunde = Math.round((((wert + wert2) / 1000) /60) /60);
+console.log(stunde);

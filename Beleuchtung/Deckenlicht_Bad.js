@@ -26,7 +26,7 @@ on ({id: new RegExp("0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder" + "|" 
         setState("javascript.0.beleuchtung.bad.nische.Endzeit", endzeit);
         let dauer = endzeit.getTime() - startzeit.getTime();
         setState("javascript.0.beleuchtung.bad.nische.Dauer", dauer);
-        setState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer", getState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer").val + dauer);
+        setState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer", getState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer").val + Math.round((((dauer /1000) /60) /60)));
     }
 });
 
