@@ -3,79 +3,50 @@ createState("beleuchtung.bad.nische.Startzeit", function () {});
 createState("beleuchtung.bad.nische.Endzeit", function () {});
 createState("beleuchtung.bad.nische.Dauer", function () {});
 createState("beleuchtung.bad.nische.gesamt_Dauer", function () {});
-let startzeit;
-let endzeit;
-let h = [
-            [40,40,50,50,50,60,70,70,70,80,80,80,90,90,100,100,100,90,90,80,70,60,50,40], //Level
-            [2200,2200,2200,2200,2200,2300,2600,2600,2600,2900,3500,4100,4500,5000,5300,5300,5300,5000,4100,3500,2900,2300,2200,2200]   //farbe
-        ];
-on ({id: new RegExp("0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder" + "|" + "0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische"), change: "ne"}, async function (obj) {
-    if (obj.state.val && (getState("alias.0.Badezimmer.Lichtlevel_Bad.ACTUAL").val < 40 || getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu").val == true)){
-        setState("hue.0.Badezimmer_Nische.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-        setState("hue.0.Badezimmer_Nische_vorne.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-        setState("hue.0.Badezimmer_Nische.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-        setState("hue.0.Badezimmer_Nische_vorne.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-        setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", true);
-        startzeit = new Date();
-        setState("javascript.0.beleuchtung.bad.nische.Startzeit", startzeit);
+const badezimmer = {
+    //schalter und bedingungen 
+    bewegungsmelder: "0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder",
+    licht_level: "zigbee.0.00158d000447eae2.illuminance",
+    rolladen_zu: "0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu",
+
+    //Leuchten
+    l_nische_1: "hue.0.Badezimmer_Nische", //.level .ct . on
+    l_nische_2: "hue.0.Badezimmer_Nische_vorne", //.level .ct . on
+    leuchten_vis: "0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische",
+    leuchten_start: "javascript.0.beleuchtung.bad.nische.Startzeit",
+    leuchten_ende: "javascript.0.beleuchtung.bad.nische.Endzeit",
+    leuchten_dauer: "javascript.0.beleuchtung.bad.nische.Dauer",
+    leuchten_gdauer: "javascript.0.beleuchtung.bad.nische.gesamt_Dauer",
+    watt_nische_1: 5,
+    watt_nische_2: 5,
+
+    // Methoden
+    nische_einschalten(startzeit) {
+        setState(this.l_nische_1 + ".level", beleuchtungNachZeit(startzeit)[0]);
+        setState(this.l_nische_2 + ".level", beleuchtungNachZeit(startzeit)[0]);
+        setState(this.l_nische_1 + ".ct", beleuchtungNachZeit(startzeit)[1]);
+        setState(this.l_nische_2 + ".ct", beleuchtungNachZeit(startzeit)[1]);
+        setState(this.leuchten_vis, true);
+        setState(this.leuchten_start, startzeit);
+    },
+    nische_auschalten(endzeit) {
+        setState(this.l_nische_1 + ".on", false);
+        setState(this.l_nische_2 + ".on", false);
+        setState(this.leuchten_vis, false);
+        setState(this.leuchten_ende, endzeit);
+    },
+    zeit_berechnen() {
+        setState(this.leuchten_dauer, dauer(getState(this.leuchten_start).val, getState(this.leuchten_ende).val));
+        setState(this.leuchten_gdauer, gesamtLaufzeitTage(getState(this.leuchten_gdauer).val, dauer(getState(this.leuchten_start).val, getState(this.leuchten_ende).val)));
+    }
+};
+on ({id: new RegExp(badezimmer.bewegungsmelder + "|" + badezimmer.leuchten_vis), change: "ne"}, async function (obj) {
+    if (obj.state.val && (getState(badezimmer.licht_level).val < 40 || getState(badezimmer.rolladen_zu).val == true)){
+        badezimmer.nische_einschalten(new Date());
     } else {
-        setState("hue.0.Badezimmer_Nische.on", false);
-        setState("hue.0.Badezimmer_Nische_vorne.on", false);
-        setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", false);
-        endzeit = new Date();
-        setState("javascript.0.beleuchtung.bad.nische.Endzeit", endzeit);
-        let dauer = endzeit.getTime() - startzeit.getTime();
-        setState("javascript.0.beleuchtung.bad.nische.Dauer", dauer);
-        setState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer", getState("javascript.0.beleuchtung.bad.nische.gesamt_Dauer").val + Math.round((((dauer /1000) /60) /60)));
+        badezimmer.nische_auschalten(new Date());
+        setTimeout(function() {
+        badezimmer.zeit_berechnen();
+        },2000);
     }
 });
-
-
-
-
-// "use strict"
-// createState("Startzeit", function () {});
-// createState("Endzeit", function () {});
-// createState("Dauer", function () {});
-// createState("gesamt Dauer", function () {});
-// let h = [
-//             [40,40,50,50,50,60,70,70,70,80,80,80,90,90,100,100,100,90,90,80,70,60,50,40], //Level
-//             [2200,2200,2200,2200,2200,2300,2600,2600,2600,2900,3500,4100,4500,5000,5300,5300,5300,5000,4100,3500,2900,2300,2200,2200]   //farbe
-//         ];
-// on ({id: new RegExp("0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder" + "|" + "0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische"), change: "ne"}, async function (obj) {
-//     if (obj.state.val && (getState("alias.0.Badezimmer.Lichtlevel_Bad.ACTUAL").val < 40 || getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu").val == true)){
-//         setState("hue.0.Badezimmer_Nische.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische_vorne.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische_vorne.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-//         setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", true);
-//         setState("javascript.0.Startzeit", Date.now());
-//     } else {
-//         setState("hue.0.Badezimmer_Nische.on", false);
-//         setState("hue.0.Badezimmer_Nische_vorne.on", false);
-//         setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", false);
-//         setState("javascript.0.Endzeit", Date.now());
-//     }
-// });
-
-
-// alter Version
-
-// "use strict"
-// let h = [
-//             [40,40,50,50,50,60,70,70,70,80,80,80,90,90,100,100,100,90,90,80,70,60,50,40], //Level
-//             [2200,2200,2200,2200,2200,2300,2600,2600,2600,2900,3500,4100,4500,5000,5300,5300,5300,5000,4100,3500,2900,2300,2200,2200]   //farbe
-//         ];
-// on ({id: new RegExp("0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder" + "|" + "0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische"), change: "ne"}, async function (obj) {
-//     if (obj.state.val && (getState("alias.0.Badezimmer.Lichtlevel_Bad.ACTUAL").val < 40 || getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu").val == true)){
-//         setState("hue.0.Badezimmer_Nische.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische_vorne.level", h[0][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-//         setState("hue.0.Badezimmer_Nische_vorne.ct", h[1][h.length - (h.length - (new Date().getHours()))]);
-//         setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", true);
-//     } else {
-//         setState("hue.0.Badezimmer_Nische.on", false);
-//         setState("hue.0.Badezimmer_Nische_vorne.on", false);
-//         setState("0_userdata.0.Beleuchtung.Badezimmer.Licht_Nische", false);
-//     }
-// });
