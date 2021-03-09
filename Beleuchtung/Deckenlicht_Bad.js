@@ -1,8 +1,8 @@
 "use strict"
-createState("beleuchtung.bad.spiegel.Startzeit", function () {});
-createState("beleuchtung.bad.spiegel.Endzeit", function () {});
-createState("beleuchtung.bad.spiegel.Dauer", function () {});
-createState("beleuchtung.bad.spiegel.gesamt_Dauer", function () {});
+// createState("beleuchtung.bad.spiegel.Startzeit", function () {});
+// createState("beleuchtung.bad.spiegel.Endzeit", function () {});
+// createState("beleuchtung.bad.spiegel.Dauer", function () {});
+// createState("beleuchtung.bad.spiegel.gesamt_Dauer", function () {});
 const badezimmer = {
     //schalter und bedingungen 
     bewegungsmelder: {
@@ -113,14 +113,12 @@ const badezimmer = {
     einschalten(startzeit, geraet, on, time_setzen) {       // Startzeit übergeben, gerät übergeben, on == false gibt an das farbe und level übergeben wird, ob die zeit gesetzt werden soll(bei mehreen lampen)
         if (on) {
             setState(geraet.licht + geraet.on, true);
-            setState(geraet.vis, true);
             if (time_setzen) {
                 setState(geraet.start_t, startzeit);
                 }
         } else {
             setState(geraet.licht + geraet.level, beleuchtungNachZeit(startzeit)[0]);
             setState(geraet.licht + geraet.ct, beleuchtungNachZeit(startzeit)[1]);
-            setState(geraet.vis, true);
             if (time_setzen) {
                 setState(geraet.start_t, startzeit);
                 }
@@ -128,7 +126,6 @@ const badezimmer = {
         },
     auschalten(endzeit, geraet, zeit_setzen) {              // Startzeit übergeben, gerät übergeben, ob die zeit gesetzt werden soll(bei mehreen lampen)
         setState(geraet.licht + geraet.on, false);
-        setState(geraet.vis, false);
         if (zeit_setzen) {
             setState(geraet.ende_t, endzeit);
             setTimeout(function() {
@@ -143,10 +140,9 @@ const badezimmer = {
     bewegung(obj) {
         if (obj) {
             setState(this.bewegungsmelder.vis, true);
-            clearTimeout(tbwm);
-            var tbwm = setTimeout(() => {
-                setState(this.bewegungsmelder.vis, false);     
-            }, 5 * 60000);
+            setTimeout(function() {
+                   setState(this.bewegungsmelder.vis, false);
+                    },300000);
             }
         }
 };
@@ -154,7 +150,7 @@ on({id: badezimmer.bewegungsmelder.motion, change: "ne"}, async function (obj) {
     badezimmer.bewegung(obj.state.val);
     });
 on({id: badezimmer.bewegungsmelder.vis, change: "ne"}, async function (obj) {
-    if (getState(badezimmer.bewegungsmelder.level).val < 40 || !getState(badezimmer.rolladen_zu)) {
+    if (obj.state.val == false || getState(badezimmer.bewegungsmelder.level).val < 40 || !getState(badezimmer.rolladen_zu)) {
     badezimmer.start("nische_1", obj.state.val);
     badezimmer.start("nische_2", obj.state.val);
         }
