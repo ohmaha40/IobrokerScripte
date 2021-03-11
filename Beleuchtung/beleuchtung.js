@@ -1,8 +1,8 @@
 "use strict"
-// createState("beleuchtung.bad.spiegel.Startzeit", function () {});
-// createState("beleuchtung.bad.spiegel.Endzeit", function () {});
-// createState("beleuchtung.bad.spiegel.Dauer", function () {});
-// createState("beleuchtung.bad.spiegel.gesamt_Dauer", function () {});
+// createState("beleuchtung.wohnzimmer.baum_leuchte.Startzeit", function () { });
+// createState("beleuchtung.wohnzimmer.baum_leuchte.Endzeit", function () { });
+// createState("beleuchtung.wohnzimmer.baum_leuchte.Dauer", function () { });
+// createState("beleuchtung.wohnzimmer.baum_leuchte.gesamt_Dauer", function () { });
 const beleuchtung = {
     funktionen_allgemein: {
         start(geraet_s, obj) {         // String für Gerät übergeben und anschalte true ausschalten false
@@ -14,11 +14,13 @@ const beleuchtung = {
                     geraet = beleuchtung.badezimmer.nische_1;
                     an = false;
                     time = true;
+                    //console.log("Debug_Message: Nische_1");
                     break;
                 case "nische_2":
                     geraet = beleuchtung.badezimmer.nische_2;
                     an = false;
                     time = false;
+                    //console.log("Debug_Message: Nische_2");
                     break;
                 case "dusche":
                     geraet = beleuchtung.badezimmer.dusche;
@@ -35,11 +37,28 @@ const beleuchtung = {
                     an = true;
                     time = true;
                     break;
+                case "wohnzimmer_stehlampe_groß":
+                    geraet = beleuchtung.wohnzimmer.stehlampe_groß;
+                    an = false;
+                    time = true;
+                    break;
+                case "baum_lampe":
+                    geraet = beleuchtung.wohnzimmer.baum_lampe;
+                    an = true;
+                    time = true;
+                    break;
+                case "schlafzimmer_decke":
+                    geraet = beleuchtung.schlafzimmer.schlafzimmer_decke;
+                    an = false;
+                    time = true;
+                    break;
             }
             if (obj && getState(geraet.licht + geraet.on).val == false) {
                 this.einschalten(new Date(), geraet, an, time);
+                //console.log(`Debug_Message: zu einschalten obj ${obj}. Sollte true sein`);
             } else {
                 this.auschalten(new Date(), geraet, time);
+                //console.log(`Debug_Message: zu einschalten obj ${obj}. Sollte false sein`);
             }
         },
         beleuchtungNachZeit(akt_zeit) {
@@ -65,6 +84,7 @@ const beleuchtung = {
             }
         },
         auschalten(endzeit, geraet, zeit_setzen) {              // Startzeit übergeben, gerät übergeben, ob die zeit gesetzt werden soll(bei mehreen lampen)
+            //console.log(`Debug_Message: ausschalten Geräte: ${geraet}.`);
             setState(geraet.licht + geraet.on, false);
             if (zeit_setzen) {
                 setState(geraet.ende_t, endzeit);
@@ -85,15 +105,19 @@ const beleuchtung = {
             let gesamtlaufzeit_tage = state + Math.round((((laufzeit / 1000) / 60) / 60));
             return gesamtlaufzeit_tage;
         },
-        bewegung(obj) {
+        bewegung(obj, geraet, dauer) {
             let timeout_bewegung;
+            //console.log(`Debug_Message: bewegung obj: ${obj}.`);
             if (obj) {
-                setState(beleuchtung.badezimmer.bewegungsmelder.vis, true);
-                (function () {if (timeout_bewegung) {clearTimeout(timeout_bewegung); timeout_bewegung = null;}})();
-            } else {
+                setState(geraet.vis, true);
+                //console.log(`Debug_Message: timeout gestoppt: ${timeout_bewegung}.`);
+                (function () { if (timeout_bewegung) { clearTimeout(timeout_bewegung); timeout_bewegung = null; } })();
+                //console.log(`Debug_Message: bewegung timeout: ${timeout_bewegung}.`);
+                //console.log(`Debug_Message: timeout läuft: ${timeout_bewegung}.`);
                 timeout_bewegung = setTimeout(function () {
-                    setState(beleuchtung.badezimmer.bewegungsmelder.vis, false);
-                }, 300000);
+                    //console.log(`Debug_Message: bewegung timeout: ${timeout_bewegung}.`);
+                    setState(geraet.vis, false);
+                }, dauer);
             }
         }
     },
@@ -102,7 +126,8 @@ const beleuchtung = {
         bewegungsmelder: {
             level: "zigbee.0.00158d000447eae2.illuminance",
             motion: "zigbee.0.00158d000447eae2.occupancy",
-            vis: "0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder"
+            vis: "0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder",
+            timeout_bad: 300000
         },
         rolladen_zu: "0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu",
         //Leuchten Nische
@@ -168,8 +193,44 @@ const beleuchtung = {
         }
     },
     wohnzimmer: {
+        stehlampe_groß: {
+            licht: "zigbee.0.d0cf5efffec44341", //.level .ct . on
+            level: ".brightness",
+            ct: ".colortemp",
+            on: ".state",
+            vis: "0_userdata.0.Beleuchtung.Wohnzimmer.Stehleuchte_groß",
+            start_t: "javascript.0.beleuchtung.wohnzimmer.stehlampe_groß.Startzeit",
+            ende_t: "javascript.0.beleuchtung.wohnzimmer.stehlampe_groß.Endzeit",
+            dauer_t: "javascript.0.beleuchtung.wohnzimmer.stehlampe_groß.Dauer",
+            dauer_t_gesamt: "javascript.0.beleuchtung.wohnzimmer.stehlampe_groß.gesamt_Dauer",
+            leistung: 5
+        },
+        baum_lampe: {
+            licht: "tuya.0.4530056170039f4b2dfc", //. on
+            level: "",
+            ct: "",
+            on: ".1",
+            vis: "0_userdata.0.Beleuchtung.Wohnzimmer.Baum_leuchte",
+            start_t: "javascript.0.beleuchtung.wohnzimmer.baum_leuchte.Startzeit",
+            ende_t: "javascript.0.beleuchtung.wohnzimmer.baum_leuchte.Endzeit",
+            dauer_t: "javascript.0.beleuchtung.wohnzimmer.baum_leuchte.Dauer",
+            dauer_t_gesamt: "javascript.0.beleuchtung.wohnzimmer.baum_leuchte.gesamt_Dauer",
+            leistung: 5
+        }
     },
     schlafzimmer: {
+        schlafzimmer_decke: {
+            licht: "zigbee.0.000b57fffed354b1", //.level .ct . on
+            level: ".brightness",
+            ct: ".colortemp",
+            on: ".state",
+            vis: "0_userdata.0.Beleuchtung.Schlafzimmer_Main.Deckenlicht",
+            start_t: "javascript.0.beleuchtung.schlafzimmer.decke.Startzeit",
+            ende_t: "javascript.0.beleuchtung.schlafzimmer.decke.Endzeit",
+            dauer_t: "javascript.0.beleuchtung.schlafzimmer.decke.Dauer",
+            dauer_t_gesamt: "javascript.0.beleuchtung.schlafzimmer.decke.gesamt_Dauer",
+            leistung: 5
+        }
     },
     flur: {
     }
@@ -178,18 +239,20 @@ const beleuchtung = {
 //Aufrufe
 on({ id: beleuchtung.badezimmer.bewegungsmelder.motion, change: "ne" }, async function (obj) {
     let val = obj.state.val;
-    beleuchtung.funktionen_allgemein.bewegung(val);
+    //console.log(`Debug_Message: motion val: ${val}.`);
+    beleuchtung.funktionen_allgemein.bewegung(val, beleuchtung.badezimmer.bewegungsmelder, beleuchtung.badezimmer.bewegungsmelder.timeout_bad);
 });
 on({ id: beleuchtung.badezimmer.bewegungsmelder.vis, change: "ne" }, async function (obj) {
     let val = obj.state.val;
+    //console.log(`Debug_Message: bewegungsmelder.vis val: ${val}.`);
     if (val == false || getState(beleuchtung.badezimmer.bewegungsmelder.level).val < 40 || !getState(beleuchtung.badezimmer.rolladen_zu)) {
-        setTimeout(function () {
-            setState(beleuchtung.badezimmer.nische_1.vis, val);
-        }, 500)
+        //console.log(`Debug_Message: timeout nach bewegungsmelder vis abgelaufen: ${val}.`);
+        setState(beleuchtung.badezimmer.nische_1.vis, val);
     }
 });
 on({ id: beleuchtung.badezimmer.nische_1.vis, change: "ne" }, async function (obj) {
     let val = obj.state.val;
+    //console.log(`Debug_Message: nische on val: ${val}.`);
     beleuchtung.funktionen_allgemein.start("nische_1", val);
     beleuchtung.funktionen_allgemein.start("nische_2", val);
 });
@@ -204,4 +267,16 @@ on({ id: beleuchtung.badezimmer.decke.vis, change: "ne" }, async function (obj) 
 on({ id: beleuchtung.badezimmer.spiegelschrank.vis, change: "ne" }, async function (obj) {
     let val = obj.state.val;
     beleuchtung.funktionen_allgemein.start("spiegelschrank", val);
+});
+on({ id: beleuchtung.wohnzimmer.stehlampe_groß.vis, change: "ne" }, async function (obj) {
+    let val = obj.state.val;
+    beleuchtung.funktionen_allgemein.start("wohnzimmer_stehlampe_groß", val);
+});
+on({ id: beleuchtung.wohnzimmer.baum_lampe.vis, change: "ne" }, async function (obj) {
+    let val = obj.state.val;
+    beleuchtung.funktionen_allgemein.start("baum_lampe", val);
+});
+on({ id: beleuchtung.schlafzimmer.schlafzimmer_decke.vis, change: "ne" }, async function (obj) {
+    let val = obj.state.val;
+    beleuchtung.funktionen_allgemein.start("schlafzimmer_decke", val);
 });
