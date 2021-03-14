@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 // createState("0_userdata.0.Beleuchtung.Flur.Bewegungsmelder", function () { });
 // createState("0_userdata.0.Beleuchtung.Flur.Deckenlicht", function () { });
 // createState("beleuchtung.Flur.Startzeit", function () { });
@@ -9,6 +9,9 @@ const leuchten = {
     badezimmer: {
         //schalter und bedingungen 
         bewegungsmelder: {
+            bewegungsmelder: true,
+            sonder_1: true,
+            sonder_2: true,
             level: "zigbee.0.00158d000447eae2.illuminance",
             motion: "zigbee.0.00158d000447eae2.occupancy",
             vis: "0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder",
@@ -22,6 +25,11 @@ const leuchten = {
         rolladen_zu: "0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu",
         //Leuchten Nische
         nische_1: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: !getState(leuchten.badezimmer.rolladen_zu),
+            sonder_2: true,
+            hellig_farbe_setzen: true,
             licht: "hue.0.Badezimmer_Nische", //.level .ct . on
             level: ".level",
             ct: ".ct",
@@ -34,6 +42,11 @@ const leuchten = {
             leistung: 5
         },
         nische_2: {
+            bewegungsmelder: false,
+            time_setzen: false,
+            sonder_1: !getState(leuchten.badezimmer.rolladen_zu),
+            sonder_2: true,
+            hellig_farbe_setzen: true,
             licht: "hue.0.Badezimmer_Nische_vorne", //.level .ct . on
             level: ".level",
             ct: ".ct",
@@ -46,6 +59,11 @@ const leuchten = {
             leistung: 5
         },
         dusche: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: false,
             licht: "shelly.0.SHSW-1#BCDDC276F298#1.Relay0", //.on
             level: "",
             ct: "",
@@ -58,6 +76,11 @@ const leuchten = {
             leistung: 15
         },
         decke: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: false,
             licht: "sonoff.0.Schalter_Badlicht", //.on
             level: "",
             ct: "",
@@ -70,6 +93,11 @@ const leuchten = {
             leistung: 15
         },
         spiegelschrank: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: false,
             licht: "shelly.0.SHSW-1#A4CF12F47D41#1.Relay0", //.on
             level: "",
             ct: "",
@@ -84,6 +112,11 @@ const leuchten = {
     },
     wohnzimmer: {
         stehlampe_groß: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: true,
             licht: "zigbee.0.d0cf5efffec44341", //.level .ct . on
             level: ".brightness",
             ct: ".colortemp",
@@ -96,6 +129,11 @@ const leuchten = {
             leistung: 5
         },
         baum_lampe: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: false,
             licht: "tuya.0.4530056170039f4b2dfc", //. on
             level: "",
             ct: "",
@@ -124,6 +162,9 @@ const leuchten = {
     },
     flur: {
         bewegungsmelder: {
+            bewegungsmelder: true,
+            sonder_1: true,
+            sonder_2: true,
             level: "zigbee.0.001788010328723c.illuminance",
             motion: "zigbee.0.001788010328723c.occupancy",
             vis: "0_userdata.0.Beleuchtung.Flur.Bewegungsmelder",
@@ -133,6 +174,11 @@ const leuchten = {
             luminanz: 40
         },
         flurlicht: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: true,
             licht: "sonoff.0.Schalter_Flurlicht", //.on
             level: "",
             ct: "",
@@ -146,89 +192,38 @@ const leuchten = {
         }
     }
 };
-function beleuchtung(objekt, lampe, leuchtmittel, bwm, sonder) {
+function beleuchtung(objekt, lampe) {
     let timeout_bewegung;
-    if (bwm) {
+    if (objekt.bewegungsmelder.bewegungsmelder) {
         on({ id: objekt.bewegungsmelder.motion, change: "ne" }, async function (obj) {
             let val = obj.state.val;
-            funktionen_allgemein.bewegung(val, objekt.bewegungsmelder, objekt.bewegungsmelder.timeout);
+            funktionen_allgemein.bewegung(val);
         });
         on({ id: objekt.bewegungsmelder.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
-            if (val == false || getState(objekt.bewegungsmelder.level).val < objekt.bewegungsmelder.luminanz || sonder) {
+            if (val == false || getState(objekt.bewegungsmelder.level).val < objekt.bewegungsmelder.luminanz || (lampe.sonder_1 && lampe.sonder_2)) {
                 setState(lampe.vis, val);
             }
         });
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
-            for (let i = 0; i < leuchtmittel.length; i++){
-                funktionen_allgemein.start(leuchtmittel[i], val);
-                }
+            funktionen_allgemein.start(val);
+                
         });
     } else {
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
-            for (let i = 0; i < leuchtmittel.length; i++){
-                funktionen_allgemein.start(leuchtmittel[i], val);
-                }
+            if (lampe.sonder_1 && lampe.sonder_2) {
+            funktionen_allgemein.start(val);
+            }
         });
     }
     const funktionen_allgemein = {
-        start(geraet_s, obj) {         // String für Gerät übergeben und anschalte true ausschalten false
-            let geraet;
-            let an;
-            let time;
-            switch (geraet_s) {
-                case "nische_1":
-                    geraet = objekt.nische_1;
-                    an = false;
-                    time = true;
-                    break;
-                case "nische_2":
-                    geraet = objekt.nische_2;
-                    an = false;
-                    time = false;
-                    break;
-                case "dusche":
-                    geraet = objekt.dusche;
-                    an = true;
-                    time = true;
-                    break;
-                case "decke":
-                    geraet = objekt.decke;
-                    an = true;
-                    time = true;
-                    break;
-                case "spiegelschrank":
-                    geraet = objekt.spiegelschrank;
-                    an = true;
-                    time = true;
-                    break;
-                case "wohnzimmer_stehlampe_groß":
-                    geraet = objekt.stehlampe_groß;
-                    an = false;
-                    time = true;
-                    break;
-                case "baum_lampe":
-                    geraet = objekt.baum_lampe;
-                    an = true;
-                    time = true;
-                    break;
-                case "schlafzimmer_decke":
-                    geraet = objekt.schlafzimmer_decke;
-                    an = false;
-                    time = true;
-                    break;
-                case "flurlicht":
-                    geraet = objekt.flurlicht;
-                    an = true;
-                    time = true;
-                    break;
-            }
-            if (obj && getState(geraet.licht + geraet.on).val == false) {
-                this.einschalten(new Date(), geraet, an, time);
+        start(obj) {         // String für Gerät übergeben und anschalte true ausschalten false
+            if (obj && getState(lampe.licht + lampe.on).val == false) {
+                this.einschalten(new Date());
             } else {
-                this.auschalten(new Date(), geraet, time);
+                this.auschalten(new Date());
             }
         },
         beleuchtungNachZeit(akt_zeit) {
@@ -239,32 +234,32 @@ function beleuchtung(objekt, lampe, leuchtmittel, bwm, sonder) {
             let beleuchtungNachZeit_array = [h[0][h.length - (h.length - akt_zeit.getHours())], h[1][h.length - (h.length - akt_zeit.getHours())]];
             return beleuchtungNachZeit_array;
         },
-        einschalten(startzeit, geraet, on, time_setzen) {       // Startzeit übergeben, gerät übergeben, on == false gibt an das farbe und level übergeben wird, ob die zeit gesetzt werden soll(bei mehreen lampen)
-            if (on) {
-                setState(geraet.licht + geraet.on, true);
-                if (time_setzen) {
-                    setState(geraet.start_t, startzeit);
+        einschalten(startzeit) {       // Startzeit übergeben, gerät übergeben, on == false gibt an das farbe und level übergeben wird, ob die zeit gesetzt werden soll(bei mehreen lampen)
+            if (lampe.hellig_farbe_setzen) {
+                setState(lampe.licht + lampe.on, true);
+                if (lampe.time_setzen) {
+                    setState(lampe.start_t, startzeit);
                 }
             } else {
-                setState(geraet.licht + geraet.level, this.beleuchtungNachZeit(startzeit)[0]);
-                setState(geraet.licht + geraet.ct, this.beleuchtungNachZeit(startzeit)[1]);
-                if (time_setzen) {
-                    setState(geraet.start_t, startzeit);
+                setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
+                setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
+                if (lampe.time_setzen) {
+                    setState(lampe.start_t, startzeit);
                 }
             }
         },
-        auschalten(endzeit, geraet, zeit_setzen) {              // Startzeit übergeben, gerät übergeben, ob die zeit gesetzt werden soll(bei mehreen lampen)
-            setState(geraet.licht + geraet.on, false);
-            if (zeit_setzen) {
-                setState(geraet.ende_t, endzeit);
+        auschalten(endzeit) {              // Startzeit übergeben, gerät übergeben, ob die zeit gesetzt werden soll(bei mehreen lampen)
+            setState(lampe.licht + lampe.on, false);
+            if (lampe.time_setzen) {
+                setState(lampe.ende_t, endzeit);
                 setTimeout(function () {
-                    funktionen_allgemein.zeit_berechnen(geraet);
+                    funktionen_allgemein.zeit_berechnen();
                 }, 2000);
             }
         },
-        zeit_berechnen(geraet) {
-            setState(geraet.dauer_t, this.dauer(getState(geraet.start_t).val, getState(geraet.ende_t).val));
-            setState(geraet.dauer_t_gesamt, this.gesamtLaufzeitTage(getState(geraet.dauer_t_gesamt).val, this.dauer(getState(geraet.start_t).val, getState(geraet.ende_t).val)));
+        zeit_berechnen() {
+            setState(lampe.dauer_t, this.dauer(getState(lampe.start_t).val, getState(lampe.ende_t).val));
+            setState(lampe.dauer_t_gesamt, this.gesamtLaufzeitTage(getState(lampe.dauer_t_gesamt).val, this.dauer(getState(lampe.start_t).val, getState(lampe.ende_t).val)));
         },
         dauer(startzeit, endzeit) {
             let laufzeit = new Date(endzeit).getTime() - new Date(startzeit).getTime();
@@ -274,9 +269,9 @@ function beleuchtung(objekt, lampe, leuchtmittel, bwm, sonder) {
             let gesamtlaufzeit_tage = state + Math.round((((laufzeit / 1000) / 60) / 60));
             return gesamtlaufzeit_tage;
         },
-        bewegung(obj, geraet, dauer) {
+        bewegung(obj) {
             if (obj) {
-                setState(geraet.vis, true);
+                setState(lampe.vis, true);
                 (function () {
                     if (timeout_bewegung) {
                         clearTimeout(timeout_bewegung);
@@ -284,8 +279,8 @@ function beleuchtung(objekt, lampe, leuchtmittel, bwm, sonder) {
                     }
                 })();
                 timeout_bewegung = setTimeout(async function () {
-                    setState(geraet.vis, false);
-                }, dauer);
+                    setState(lampe.vis, false);
+                }, objekt.bewegungsmelder.timeout);
             }
         }
     }
@@ -293,19 +288,11 @@ function beleuchtung(objekt, lampe, leuchtmittel, bwm, sonder) {
 
 
 //Aufrufe Bad
-let lampen_nische = ["nische_1", "nische_2"];
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.nische_1, lampen_nische, true, !getState(leuchten.badezimmer.rolladen_zu)); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder, sonderbedingung1(falls keine dann falls)
-let lampen_flurlicht = ["flurlicht"];
-new beleuchtung(leuchten.flur, leuchten.flur.flurlicht, lampen_flurlicht, true, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_dusche = ["dusche"];
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.dusche, lampen_dusche, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_decke = ["decke"];
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.decke, lampen_decke, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_spiegelschrank = ["spiegelschrank"];
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.spiegelschrank, lampen_spiegelschrank, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_wohnzimmer_stehlampe_groß = ["wohnzimmer_stehlampe_groß"];
-new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.stehlampe_groß, lampen_wohnzimmer_stehlampe_groß, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_wohnzimmer_baum_lampe = ["baum_lampe"];
-new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.baum_lampe, lampen_wohnzimmer_baum_lampe, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
-let lampen_schlafzimmer_decke = ["schlafzimmer_decke"];
-new beleuchtung(leuchten.schlafzimmer, leuchten.schlafzimmer.schlafzimmer_decke, lampen_schlafzimmer_decke, false); //raum angeben, lampepfad angeben, lampe text"string" true bedeutet mit bewegungsmelder
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.nische_1); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.flur, leuchten.flur.flurlicht); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.dusche); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.decke); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.spiegelschrank); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.stehlampe_groß); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.baum_lampe); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.schlafzimmer, leuchten.schlafzimmer.schlafzimmer_decke); //raum angeben, lampepfad angeben
