@@ -25,9 +25,11 @@
 //     day: "2-digit"
 // });
 // console.log(end);
-let wert = 58983811;
-let wert2 = 13081924;
-let stunde = Math.round((((wert + wert2) / 1000) /60) /60);
-console.log(stunde);
+// let wert = 58983811;
+// let wert2 = 13081924;
+// let stunde = Math.round((((wert + wert2) / 1000) /60) /60);
+// console.log(stunde);
 
-let timer = setTimeout(async function (){console.log(timer)},2000);
+// let timer = setTimeout(async function (){console.log(timer)},2000);
+let a = new Date(0,0,0,17, 30, 0);
+console.log(a);

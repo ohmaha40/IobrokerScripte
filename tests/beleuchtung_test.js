@@ -27,7 +27,7 @@ const leuchten = {
         nische_1: {
             bewegungsmelder: false,
             time_setzen: true,
-            sonder_1: !getState(leuchten.badezimmer.rolladen_zu),
+            sonder_1: !getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu"),
             sonder_2: true,
             hellig_farbe_setzen: true,
             licht: "hue.0.Badezimmer_Nische", //.level .ct . on
@@ -44,7 +44,7 @@ const leuchten = {
         nische_2: {
             bewegungsmelder: false,
             time_setzen: false,
-            sonder_1: !getState(leuchten.badezimmer.rolladen_zu),
+            sonder_1: !getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu"),
             sonder_2: true,
             hellig_farbe_setzen: true,
             licht: "hue.0.Badezimmer_Nische_vorne", //.level .ct . on
@@ -134,7 +134,7 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            licht: "tuya.0.4530056170039f4b2dfc", //. on
+            licht: "tuya.0.4530056170039f4b2dfc", //. on tuya.0.4530056170039f4b2dfc
             level: "",
             ct: "",
             on: ".1",
@@ -148,6 +148,11 @@ const leuchten = {
     },
     schlafzimmer: {
         schlafzimmer_decke: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: false,
             licht: "zigbee.0.000b57fffed354b1", //.level .ct . on
             level: ".brightness",
             ct: ".colortemp",
@@ -192,9 +197,9 @@ const leuchten = {
         }
     }
 };
-function beleuchtung(objekt, lampe) {
+function beleuchtung(objekt, lampe, bwm) {
     let timeout_bewegung;
-    if (objekt.bewegungsmelder.bewegungsmelder) {
+    if (bwm) {
         on({ id: objekt.bewegungsmelder.motion, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             funktionen_allgemein.bewegung(val);
@@ -207,6 +212,7 @@ function beleuchtung(objekt, lampe) {
         });
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
+            console.log("bis hier hin falsch");
             funktionen_allgemein.start(val);
                 
         });
@@ -236,13 +242,14 @@ function beleuchtung(objekt, lampe) {
         },
         einschalten(startzeit) {       // Startzeit übergeben, gerät übergeben, on == false gibt an das farbe und level übergeben wird, ob die zeit gesetzt werden soll(bei mehreen lampen)
             if (lampe.hellig_farbe_setzen) {
-                setState(lampe.licht + lampe.on, true);
+                setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
+                setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
+                
                 if (lampe.time_setzen) {
                     setState(lampe.start_t, startzeit);
                 }
             } else {
-                setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
-                setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
+                setState(lampe.licht + lampe.on, true);
                 if (lampe.time_setzen) {
                     setState(lampe.start_t, startzeit);
                 }
@@ -288,11 +295,11 @@ function beleuchtung(objekt, lampe) {
 
 
 //Aufrufe Bad
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.nische_1); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.flur, leuchten.flur.flurlicht); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.dusche); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.decke); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.spiegelschrank); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.stehlampe_groß); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.baum_lampe); //raum angeben, lampepfad angeben
-new beleuchtung(leuchten.schlafzimmer, leuchten.schlafzimmer.schlafzimmer_decke); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.nische_1, true); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.flur, leuchten.flur.flurlicht, true); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.dusche, false); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.decke, false); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.spiegelschrank, false); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.stehlampe_groß, false); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.baum_lampe, false); //raum angeben, lampepfad angeben
+new beleuchtung(leuchten.schlafzimmer, leuchten.schlafzimmer.schlafzimmer_decke, false); //raum angeben, lampepfad angeben
