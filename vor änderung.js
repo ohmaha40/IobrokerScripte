@@ -16,16 +16,13 @@ const leuchten = {
             motion: "zigbee.0.00158d000447eae2.occupancy",
             vis: "0_userdata.0.Beleuchtung.Badezimmer.Bewegungsmelder",
             timeout: 100000,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
+            timeout_text: "timeout_bad",
+            schedule_start: "",
+            schedule_ende: "",
             luminanz: 40
 
         },
+        rolladen_zu: "0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu",
         //Leuchten Nische
         nische_1: {
             bewegungsmelder: false,
@@ -33,13 +30,6 @@ const leuchten = {
             sonder_1: getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu"),
             sonder_2: true,
             hellig_farbe_setzen: true,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "hue.0.Badezimmer_Nische", //.level .ct . on
             level: ".level",
             ct: ".ct",
@@ -57,13 +47,6 @@ const leuchten = {
             sonder_1: getState("0_userdata.0.Rolladensteuerung.Rolladen_Bad.Rolladen_Bad_ist_Zu"),
             sonder_2: true,
             hellig_farbe_setzen: true,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "hue.0.Badezimmer_Nische_vorne", //.level .ct . on
             level: ".level",
             ct: ".ct",
@@ -81,13 +64,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "shelly.0.SHSW-1#BCDDC276F298#1.Relay0", //.on
             level: "",
             ct: "",
@@ -105,13 +81,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "sonoff.0.Schalter_Badlicht", //.on
             level: "",
             ct: "",
@@ -129,13 +98,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "shelly.0.SHSW-1#A4CF12F47D41#1.Relay0", //.on
             level: "",
             ct: "",
@@ -155,13 +117,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: true,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "zigbee.0.d0cf5efffec44341", //.level .ct . on
             level: ".brightness",
             ct: ".colortemp",
@@ -179,13 +134,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "tuya.0.4530056170039f4b2dfc", //. on tuya.0.4530056170039f4b2dfc
             level: "",
             ct: "",
@@ -205,13 +153,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: true,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "zigbee.0.000b57fffed354b1", //.level .ct . on
             level: ".brightness",
             ct: ".colortemp",
@@ -233,13 +174,8 @@ const leuchten = {
             motion: "zigbee.0.001788010328723c.occupancy",
             vis: "0_userdata.0.Beleuchtung.Flur.Bewegungsmelder",
             timeout: 10000,
-            schedule: [
-                true /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
+            schedule_start: [17, 30],
+            schedule_ende: [8, 0],
             luminanz: 40
         },
         flurlicht: {
@@ -248,13 +184,6 @@ const leuchten = {
             sonder_1: true,
             sonder_2: true,
             hellig_farbe_setzen: false,
-            schedule: [
-                false /* beachten?*/,
-                17 /* stunde start*/,
-                30 /* min start*/,
-                8 /* stunde ende*/,
-                0 /* min ende*/
-            ],
             licht: "sonoff.0.Schalter_Flurlicht", //.on
             level: "",
             ct: "",
@@ -266,22 +195,17 @@ const leuchten = {
             dauer_t_gesamt: "javascript.0.beleuchtung.Flur.gesamt_Dauer",
             leistung: 5
         }
-    },
-    time_schedule(ziel) {
-        schedule({ hour: ziel.schedule[1], minute: ziel.schedule[2] }, async function () {
-            ziel.sonder_2 = true;
-        });
-        schedule({ hour: ziel.schedule[3], minute: ziel.schedule[4] }, async function () {
-            ziel.sonder_2 = false;
-        });
-    },
+    }
 };
+schedule({hour: leuchten.flur.bewegungsmelder.schedule_start[0], minute: leuchten.flur.bewegungsmelder.schedule_start[1]}, async function () {                 // Flurlicht auf Uhrzeit setzen
+    leuchten.flur.bewegungsmelder.sonder_2 = true;
+});
+schedule({hour: leuchten.flur.bewegungsmelder.schedule_ende[0], minute: leuchten.flur.bewegungsmelder.schedule_ende[1]}, async function () {                 // Flurlicht auf Uhrzeit setzen
+    leuchten.flur.bewegungsmelder.sonder_2 = false;
+});
 function beleuchtung(objekt, lampe, bwm) {
     let timeout_bewegung;
     if (bwm) {
-        if (objekt.bewegungsmelder.schedule[0]) {
-            leuchten.time_schedule(objekt.bewegungsmelder);
-        }
         on({ id: objekt.bewegungsmelder.motion, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             funktionen_allgemein.bewegung(val);
@@ -295,13 +219,13 @@ function beleuchtung(objekt, lampe, bwm) {
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             funktionen_allgemein.start(val);
-
+                
         });
     } else {
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             if (lampe.sonder_1 && lampe.sonder_2) {
-                funktionen_allgemein.start(val);
+            funktionen_allgemein.start(val);
             }
         });
     }
@@ -309,7 +233,6 @@ function beleuchtung(objekt, lampe, bwm) {
         start(obj) {         // String für Gerät übergeben und anschalte true ausschalten false
             if (obj && getState(lampe.licht + lampe.on).val == false) {
                 this.einschalten(new Date());
-                this.aktual_farbe();
             } else {
                 this.auschalten(new Date());
             }
@@ -326,7 +249,7 @@ function beleuchtung(objekt, lampe, bwm) {
             if (lampe.hellig_farbe_setzen) {
                 setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
                 setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
-
+                
                 if (lampe.time_setzen) {
                     setState(lampe.start_t, startzeit);
                 }
@@ -372,14 +295,6 @@ function beleuchtung(objekt, lampe, bwm) {
                     setState(objekt.bewegungsmelder.vis, false);
                 }, objekt.bewegungsmelder.timeout);
             }
-        },
-        aktual_farbe() {
-            schedule('{"time":{"start":"00:00","end":"23:59","mode":"hours","interval":1},"period":{"days":1}}', async function () {
-                if (lampe.hellig_farbe_setzen) {
-                    setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(new Date())[0]);
-                    setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(new Date())[1]);
-                }
-            });
         }
     }
 }
