@@ -326,7 +326,6 @@ function beleuchtung(objekt, lampe, bwm) {
             if (lampe.hellig_farbe_setzen) {
                 setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
                 setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
-
                 if (lampe.time_setzen) {
                     setState(lampe.start_t, startzeit);
                 }
