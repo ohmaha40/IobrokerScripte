@@ -4,22 +4,24 @@
 
         28.12.2020 Keller Christian
 */
-createState("Waschmaschine.ON", function () {
-});
-createState("Waschmaschine.wait", function () {
-});
-createState("Waschmaschine.power_temp", function () {
-});
-createState("Waschmaschine.power_ts", function () {
-});
-createState("Waschmaschine.power", function () {
-});
-createState("Waschmaschine.power_year", function () {
-});
-createState("Waschmaschine.fertig", function () {
-});
-createState("Waschmaschine.quit", function () {
-});
+// createState("Waschmaschine.ON", function () {
+// });
+// createState("Waschmaschine.wait", function () {
+// });
+// createState("Waschmaschine.power_temp", function () {
+// });
+// createState("Waschmaschine.power_ts", function () {
+// });
+// createState("Waschmaschine.power", function () {
+// });
+// createState("Waschmaschine.power_year", function () {
+// });
+// createState("Waschmaschine.fertig", function () {
+// });
+// createState("Waschmaschine.quit", function () {
+// });
+
+
 var timeout;
 on({id: 'tuya.0.4530056170039f47f244.5'/*cur power*/, change: "ne"}, function(obj) {
 //Variable setzen
