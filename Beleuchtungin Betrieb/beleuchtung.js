@@ -1,10 +1,4 @@
 "use strict"
-// createState("0_userdata.0.Beleuchtung.Flur.Bewegungsmelder", function () { });
-// createState("0_userdata.0.Beleuchtung.Flur.Deckenlicht", function () { });
-// createState("beleuchtung.Flur.Startzeit", function () { });
-// createState("beleuchtung.Flur.Endzeit", function () { });
-// createState("beleuchtung.Flur.Dauer", function () { });
-// createState("beleuchtung.Flur.gesamt_Dauer", function () { });
 const leuchten = {
     badezimmer: {
         //schalter und bedingungen 
