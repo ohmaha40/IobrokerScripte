@@ -12,13 +12,13 @@ const wasch = {
         maschine_letzter_lauf_verbrauch: "javascript.0.Waschmaschine.letzter_verbrauch",
         maschine_gesamt_verbrauch: "javascript.0.Waschmaschine.gesamt_verbrauch",
         aktuelle_leistung: "tuya.0.4530056170039f47f244.5",
-        timout_warten: 120000,
+        timout_warten: 600000,
         telegram_text: "Die Waschmaschine"
 
     },
     trockner: {
         standby_leistung: 15,
-        ein_leistung: 15,
+        ein_leistung: 150,
         maschine_an: "javascript.0.Trockner.ON",
         maschine_fertig: "javascript.0.Trockner.fertig",
         maschine_warten: "javascript.0.Trockner.wait",
@@ -29,7 +29,7 @@ const wasch = {
         maschine_letzter_lauf_verbrauch: "javascript.0.Trockner.letzter_verbrauch",
         maschine_gesamt_verbrauch: "javascript.0.Trockner.gesamt_verbrauch",
         aktuelle_leistung: "tuya.0.4530056124a1600b5822.5",
-        timout_warten: 120000,
+        timout_warten: 240000,
         telegram_text: "Die Trockner"
     }
 };
@@ -37,7 +37,7 @@ const wasch = {
 function waschen(objekt) {
     let timeout;
     on({id: objekt.aktuelle_leistung, change: "ne"}, function(obj) {
-        if (getState(objekt.maschine_an).val != true && objekt.ein_leistung > obj.state.val){
+        if (getState(objekt.maschine_an).val != true && objekt.ein_leistung < obj.state.val){
             wasche.waschen_start();
         } else if(getState(objekt.maschine_warten).val ===true && obj.state.val > objekt.ein_leistung && getState(objekt.maschine_an).val === true){
             wasche.waschen_warten_abbrechen();
