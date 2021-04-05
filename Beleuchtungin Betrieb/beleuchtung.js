@@ -1,4 +1,10 @@
 "use strict"
+// createState("0_userdata.0.Beleuchtung.Schrank.Bewegungsmelder", function () { });
+createState("0_userdata.0.Beleuchtung.Schrank.Deckenlicht", function () { });
+createState("beleuchtung.Schrank.Startzeit", function () { });
+createState("beleuchtung.Schrank.Endzeit", function () { });
+createState("beleuchtung.Schrank.Dauer", function () { });
+createState("beleuchtung.Schrank.gesamt_Dauer", function () { });
 const leuchten = {
     badezimmer: {
         //schalter und bedingungen 
@@ -218,6 +224,32 @@ const leuchten = {
             leistung: 5
         }
     },
+    schrank: {
+        schrank_licht: {
+            bewegungsmelder: false,
+            time_setzen: true,
+            sonder_1: true,
+            sonder_2: true,
+            hellig_farbe_setzen: true,
+            schedule: [
+                false /* beachten?*/,
+                17 /* stunde start*/,
+                30 /* min start*/,
+                8 /* stunde ende*/,
+                0 /* min ende*/
+            ],
+            licht: "hue.0.Schrank", //.level .ct . on
+            level: ".level",
+            ct: ".bri",
+            on: ".on",
+            vis: "0_userdata.0.Beleuchtung.Schrank.Deckenlicht",
+            start_t: "javascript.0.beleuchtung.Schrank.Startzeit",
+            ende_t: "javascript.0.beleuchtung.Schrank.Endzeit",
+            dauer_t: "javascript.0.beleuchtung.Schrank.Dauer",
+            dauer_t_gesamt: "javascript.0.beleuchtung.Schrank.gesamt_Dauer",
+            leistung: 5
+        }
+    },
     flur: {
         bewegungsmelder: {
             bewegungsmelder: true,
@@ -229,7 +261,7 @@ const leuchten = {
             timeout: 10000,
             schedule: [
                 true /* beachten?*/,
-                17 /* stunde start*/,
+                18 /* stunde start*/,
                 30 /* min start*/,
                 8 /* stunde ende*/,
                 0 /* min ende*/
@@ -318,8 +350,9 @@ function beleuchtung(objekt, lampe, bwm) {
         },
         einschalten(startzeit) {       // Startzeit übergeben, gerät übergeben, on == false gibt an das farbe und level übergeben wird, ob die zeit gesetzt werden soll(bei mehreen lampen)
             if (lampe.hellig_farbe_setzen) {
-                setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(startzeit)[0]);
-                setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(startzeit)[1]);
+                setState(lampe.licht + lampe.level, funktionen_allgemein.beleuchtungNachZeit(startzeit)[0]);
+                setState(lampe.licht + lampe.ct, funktionen_allgemein.beleuchtungNachZeit(startzeit)[1]);
+
                 if (lampe.time_setzen) {
                     setState(lampe.start_t, startzeit);
                 }
@@ -368,9 +401,9 @@ function beleuchtung(objekt, lampe, bwm) {
         },
         aktual_farbe() {
             schedule('{"time":{"start":"00:00","end":"23:59","mode":"hours","interval":1},"period":{"days":1}}', async function () {
-                if (lampe.hellig_farbe_setzen) {
-                    setState(lampe.licht + lampe.level, this.beleuchtungNachZeit(new Date())[0]);
-                    setState(lampe.licht + lampe.ct, this.beleuchtungNachZeit(new Date())[1]);
+                if (lampe.hellig_farbe_setzen && getState(lampe.licht + lampe.on).val == true) {
+                    setState(lampe.licht + lampe.level, funktionen_allgemein.beleuchtungNachZeit(new Date())[0]);
+                    setState(lampe.licht + lampe.ct, funktionen_allgemein.beleuchtungNachZeit(new Date())[1]);
                 }
             });
         }
@@ -388,3 +421,4 @@ new beleuchtung(leuchten.badezimmer, leuchten.badezimmer.spiegelschrank, false);
 new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.stehlampe_groß, false); //raum angeben, lampepfad angeben, bvm
 new beleuchtung(leuchten.wohnzimmer, leuchten.wohnzimmer.baum_lampe, false); //raum angeben, lampepfad angeben, bvm
 new beleuchtung(leuchten.schlafzimmer, leuchten.schlafzimmer.schlafzimmer_decke, false); //raum angeben, lampepfad angeben, bvm
+new beleuchtung(leuchten.schrank, leuchten.schrank.schrank_licht, false); //raum angeben, lampepfad angeben, bvm
