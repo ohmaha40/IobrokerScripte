@@ -309,15 +309,15 @@ function beleuchtung(objekt, lampe, bwm) {
             leuchten.time_schedule(objekt.bewegungsmelder);
         }
         on({ id: objekt.bewegungsmelder.motion, change: "ne" }, async function (obj) {
-            let val = obj.state.val;
-            funktionen_allgemein.bewegung(val);
-        });
-        on({ id: objekt.bewegungsmelder.vis, change: "ne" }, async function (obj) {
+  on({ id: objekt.bewegungsmelder.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             if (val == false || (getState(objekt.bewegungsmelder.level).val < objekt.bewegungsmelder.luminanz && objekt.bewegungsmelder.sonder_1 && objekt.bewegungsmelder.sonder_2)) {
                 setState(lampe.vis, val);
             }
+        });          let val = obj.state.val;
+            funktionen_allgemein.bewegung(val);
         });
+        
         on({ id: lampe.vis, change: "ne" }, async function (obj) {
             let val = obj.state.val;
             funktionen_allgemein.start(val);
