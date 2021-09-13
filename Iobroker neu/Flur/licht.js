@@ -12,7 +12,8 @@ const licht = {
 };
 let timeout_deckenlicht;
 on({id: licht.bwm.bewegung, val: true}, async function (){
-    if (compareTime("18:00", "08:00", "between")) {
+    if (compareTime("18:00", "23:59", "between") || compareTime("00:00", "08:00", "between")) {
+        console.log("zwischen den zwiten");
         clearTimeout(timeout_deckenlicht);
         if (getState(licht.deckenlicht.schalter).val == false && getState(licht.bwm.lux).val < 10) {
         setState(licht.deckenlicht.schalter, true);
@@ -31,4 +32,3 @@ on({id: licht.deckenlicht.schalter, change: "ne"}, async function (obj){
     let val = obj.state.val;
     setState(licht.deckenlicht.leuchte, val);
 });
-
