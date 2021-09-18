@@ -43,9 +43,10 @@ on({id: Rolladen.schalter_offnen, val: true}, async function () {
 on({id: Rolladen.schalter_schließen, val: true}, async function () {
     rolladen_fahren(Rolladen.dauer_zu, false);
 });
-schedule('{"time":{"exactTime":true,"start":"20:40"},"period":{"days":1}}', async function () {
+schedule('{"time":{"exactTime":true,"start":"18:00"},"period":{"days":1}}', async function () {
     rolladen_fahren(Rolladen.dauer_zu, false);
+    console.log("Test");
 });
-schedule('{"time":{"exactTime":true,"start":"06:00"},"period":{"days":1}}', async function () {
+schedule('{"time":{"exactTime":true,"start":"04:00"},"period":{"days":1}}', async function () {
     rolladen_fahren(Rolladen.dauer_auf, true);
 });

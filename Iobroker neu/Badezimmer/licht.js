@@ -16,14 +16,18 @@ const licht = {
         rückmeldung: "",
     },
     nische1_2:{
-        schalter: "0_userdata.0.Vis.Bad.spiegel",
+        schalter: "0_userdata.0.Vis.Bad.nische",
         leuchte: "hue.0.Hue_ambiance_spot_1.on",
         leuchte2: "hue.0.Hue_ambiance_spot_2.on",
         rückmeldung: "",
     },
-    bwm:{
+    /*bwm:{
         bewegung: "zigbee.0.00158d000447eae2.occupancy",
         lux: "zigbee.0.00158d000447eae2.illuminance",
+    }*/
+    bwm:{
+        bewegung: "zigbee.0.001788010328723c.occupancy",
+        lux: "zigbee.0.001788010328723c.illuminance",
     }
 };
 let timeout_deckenlicht;
