@@ -4,8 +4,8 @@ const beleuchtung = {
     Badezimmer:{
         Leuchten:{
             Deckenlampen:{
-                vis_schalter: "",
-                leuchtmittel: "",
+                vis_schalter: "0_userdata.0.Vis.Bad.deckenlicht",
+                leuchtmittel: "sonoff.0.Schalter_Badlicht.POWER",
                 rueckmeldung: "",
                 Bedingungen:{
                     bedingung_1:"",
@@ -14,9 +14,9 @@ const beleuchtung = {
                     bedingung_4:"",
                 },
                 Zeiten:{
-                    einschaltzeit:"",
-                    auschaltzeit:"",
-                    timerzeit_1:"",
+                    einschaltzeit:"11:00",
+                    auschaltzeit:"08:00",
+                    timerzeit_1:"600000",
                     timerzeit_2:"",
                 }
             },
@@ -75,8 +75,8 @@ const beleuchtung = {
         },    
         Zubehoer:{
             Bewegungsmelder:{
-                bewegung:"",
-                lux:"",
+                bewegung:"zigbee.0.001788010328723c.occupancy",
+                lux:"zigbee.0.001788010328723c.illuminance",
             }
         }
     },
@@ -142,3 +142,18 @@ function licht_einschalten(Leuchtmittel) {
 function licht_ausschalten(Leuchtmittel) {
     setState(Leuchtmittel, false);
 }
+function timer(Leuchte) {
+    let timeout_licht;
+    if(compareTime(Leuchte.Zeiten.einschaltzeit, Leuchte.Zeiten.auschaltzeit, "between")){
+        clearTimeout(timeout_licht);
+        licht_einschalten(Leuchte.leuchtmittel);
+        timeout_licht = setTimeout(async function (){
+            licht_ausschalten(Leuchte.leuchtmittel);
+        }, Leuchte.Zeiten.timerzeit_1);
+    }
+}
+
+on({id: beleuchtung.Badezimmer.Zubehoer.Bewegungsmelder, val: true}, async function () {
+    timer(beleuchtung.Badezimmer.Leuchten.Deckenlampen); 
+});
+   

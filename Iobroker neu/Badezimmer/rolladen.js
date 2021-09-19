@@ -13,25 +13,21 @@ const Rolladen = {
 function rolladen_fahren(dauer,auf) {
     if (auf) {
         let timeout_offnen = setTimeout(async function (){
-            console.log("Rolladen tiomout auf abgelaufen");
             setState(Rolladen.fahren_auf, false);
             clearTimeout(timeout_offnen);
             setState(Rolladen.ist_auf, true);
             setState(Rolladen.schalter_offnen, false);
         }, dauer);
         setState(Rolladen.fahren_auf, true);
-        console.log("Rolladen fährt auf")
         setState(Rolladen.ist_zu, false);
     } else {
         let timeout_schließen = setTimeout(async function (){
-            console.log("Rolladen tiomout zu abgelaufen");
             setState(Rolladen.fahren_zu, false);
             clearTimeout(timeout_schließen);
             setState(Rolladen.ist_zu, true);
             setState(Rolladen.schalter_schließen, false);
         }, dauer);
         setState(Rolladen.fahren_zu, true);
-        console.log("Rolladen fährt zu")
         setState(Rolladen.ist_auf, false);
     }
 }
@@ -47,6 +43,6 @@ schedule('{"time":{"exactTime":true,"start":"18:00"},"period":{"days":1}}', asyn
     rolladen_fahren(Rolladen.dauer_zu, false);
     console.log("Test");
 });
-schedule('{"time":{"exactTime":true,"start":"04:00"},"period":{"days":1}}', async function () {
+schedule('{"time":{"exactTime":true,"start":"07:00"},"period":{"days":1}}', async function () {
     rolladen_fahren(Rolladen.dauer_auf, true);
 });
