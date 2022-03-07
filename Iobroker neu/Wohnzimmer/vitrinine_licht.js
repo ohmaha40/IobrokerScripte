@@ -15,9 +15,15 @@ on({id: licht.vitrine.schalter, change: "ne"}, async function (obj){
     let val = obj.state.val;
     setState(licht.vitrine.leuchte, val);
 });
-schedule('{"time":{"exactTime":true,"start":"18:00"},"period":{"days":1}}', async function () {
+schedule('{"time":{"exactTime":true,"start":"05:00"},"period":{"days":1}}', async function () {
     setState(licht.vitrine.schalter, true);
 });
-schedule('{"time":{"exactTime":true,"start":"08:00"},"period":{"days":1}}', async function () {
+schedule('{"time":{"exactTime":true,"start":"10:00"},"period":{"days":1}}', async function () {
+    setState(licht.vitrine.schalter, false);
+});
+schedule('{"time":{"exactTime":true,"start":"16:00"},"period":{"days":1}}', async function () {
+    setState(licht.vitrine.schalter, true);
+});
+schedule('{"time":{"exactTime":true,"start":"22:00"},"period":{"days":1}}', async function () {
     setState(licht.vitrine.schalter, false);
 });
